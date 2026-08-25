@@ -14,9 +14,13 @@
 
   <header class="topbar">
     <div class="brand">
-      <span class="mark" aria-hidden="true">T</span>
-      <span class="brand-name">Telkom</span>
-      <span class="tagline">Possible Begins Here</span>
+      <img
+        class="brand-logo"
+        src="{{ base_path }}/static/img/telkom-logo.svg"
+        alt="Telkom"
+        width="129"
+        height="52"
+      />
     </div>
     <p class="topbar-note">Huawei Cloud · design &amp; API review</p>
   </header>
@@ -166,7 +170,7 @@
   <div class="telkom-chat" id="telkom-chat">
     <div class="chat-panel" id="chat-panel" role="dialog" aria-label="Telkom assistant" aria-hidden="true">
       <div class="chat-header">
-        <img src="{{ base_path }}/static/img/bot-avatar.svg" alt="" width="40" height="40" />
+        <img src="{{ base_path }}/static/img/chat-fab.svg" alt="" width="40" height="36" />
         <div class="chat-header-text">
           <strong>Telkom Assistant</strong>
           <span id="chat-status">Online · Roaming</span>
@@ -183,7 +187,7 @@
       </form>
     </div>
     <button type="button" class="chat-fab" id="chat-fab" aria-label="Open Telkom assistant" aria-expanded="false">
-      <img src="{{ base_path }}/static/img/bot-avatar.svg" alt="" width="64" height="64" />
+      <img src="{{ base_path }}/static/img/chat-fab.svg" alt="" width="72" height="64" />
     </button>
   </div>
 

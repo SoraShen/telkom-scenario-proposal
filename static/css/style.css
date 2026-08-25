@@ -61,27 +61,11 @@ body {
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(218, 222, 224, 0.75);
 }
-.brand { display: flex; align-items: center; gap: 0.55rem; flex-wrap: wrap; }
-.mark {
-  width: 2rem; height: 2rem; border-radius: 0.4rem;
-  display: grid; place-items: center;
-  background: linear-gradient(145deg, var(--blue), var(--blue-deep));
-  color: #fff; font-family: var(--display); font-weight: 700;
-}
-.brand-name {
-  font-family: var(--display);
-  font-weight: 700;
-  font-size: 1.25rem;
-  letter-spacing: -0.03em;
-  color: var(--navy);
-}
-.tagline {
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--blue-deep);
-  padding: 0.15rem 0.5rem;
-  border-radius: 999px;
-  background: rgba(0, 153, 255, 0.1);
+.brand { display: flex; align-items: center; }
+.brand-logo {
+  display: block;
+  height: 40px;
+  width: auto;
 }
 .topbar-note { margin: 0; color: var(--muted); font-size: 0.8rem; }
 
@@ -376,40 +360,24 @@ tr:last-child td { border-bottom: 0; }
 }
 
 .chat-fab {
-  width: 64px;
+  width: 72px;
   height: 64px;
   border: none;
-  border-radius: 50%;
   padding: 0;
-  background: var(--blue);
-  box-shadow: 0 12px 30px rgba(0, 153, 255, 0.45);
+  background: transparent;
+  box-shadow: none;
   cursor: pointer;
   position: relative;
   display: grid;
   place-items: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease;
 }
-.chat-fab img { width: 64px; height: 64px; border-radius: 50%; display: block; }
-.chat-fab::after {
-  content: "";
-  position: absolute;
-  inset: -6px;
-  border-radius: 50%;
-  border: 2px solid rgba(0, 153, 255, 0.4);
-  animation: fab-pulse 2.2s ease-out infinite;
-}
+.chat-fab:hover { transform: scale(1.05); }
+.chat-fab img { width: 72px; height: 64px; display: block; }
 .chat-fab.is-hidden {
   opacity: 0;
   pointer-events: none;
   transform: scale(0.85);
-}
-@keyframes fab-pulse {
-  0% { transform: scale(0.92); opacity: 0.9; }
-  70% { transform: scale(1.18); opacity: 0; }
-  100% { opacity: 0; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .chat-fab::after { animation: none; }
 }
 
 .chat-panel {
@@ -446,8 +414,8 @@ tr:last-child td { border-bottom: 0; }
   color: #fff;
 }
 .chat-header img {
-  width: 40px; height: 40px; border-radius: 50%;
-  background: rgba(255,255,255,0.15);
+  width: 44px; height: 40px; border-radius: 0;
+  background: transparent; flex-shrink: 0;
 }
 .chat-header-text { flex: 1; min-width: 0; }
 .chat-header-text strong { display: block; font-size: 0.98rem; line-height: 1.2; }
@@ -580,7 +548,7 @@ tr:last-child td { border-bottom: 0; }
 
 @media (max-width: 640px) {
   .topbar { flex-direction: column; align-items: flex-start; }
-  .tagline { display: none; }
+  .brand-logo { height: 34px; }
   .switcher-track { grid-template-columns: 1fr; }
   .journey-story-head .btn.play { width: 100%; }
   .telkom-chat {
@@ -592,6 +560,6 @@ tr:last-child td { border-bottom: 0; }
     height: min(72dvh, 620px);
     right: -0.15rem;
   }
-  .chat-fab { width: 58px; height: 58px; }
-  .chat-fab img { width: 58px; height: 58px; }
+  .chat-fab { width: 64px; height: 56px; }
+  .chat-fab img { width: 64px; height: 56px; }
 }

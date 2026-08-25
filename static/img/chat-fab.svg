@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 64" fill="none" role="img" aria-label="Telkom chat">
+  <!-- back bubble: darker blue + ? -->
+  <g filter="url(#fabShadow)">
+    <path d="M28.5 6.5c10.2 0 18.5 7.1 18.5 15.9 0 5.2-2.9 9.8-7.4 12.7l1.6 7.4-7.9-4.5c-1.5.3-3.1.5-4.8.5-10.2 0-18.5-7.1-18.5-15.9S18.3 6.5 28.5 6.5z" fill="#0057C8"/>
+  </g>
+  <text x="28.5" y="27.5" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">?</text>
+
+  <!-- front bubble: bright blue + typing dots -->
+  <g filter="url(#fabShadow)">
+    <path d="M40.2 22.2c11.4 0 20.6 7.6 20.6 17 0 5.6-3.2 10.5-8.2 13.6l1.9 8.2-9-5.1c-1.7.4-3.4.5-5.3.5-11.4 0-20.6-7.6-20.6-17s9.2-17.2 20.6-17.2z" fill="#4DB8FF"/>
+  </g>
+  <rect x="32.2" y="36.4" width="4.2" height="4.2" rx="0.7" fill="#FFFFFF"/>
+  <rect x="38.8" y="36.4" width="4.2" height="4.2" rx="0.7" fill="#FFFFFF"/>
+  <rect x="45.4" y="36.4" width="4.2" height="4.2" rx="0.7" fill="#FFFFFF"/>
+
+  <defs>
+    <filter id="fabShadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2.2" flood-color="#003F6A" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+</svg>
