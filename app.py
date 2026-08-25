@@ -1,4 +1,4 @@
-"""Telkom scenario proposal + GLM-5.2 live demos."""
+"""Telkom scenario proposal + live assistant demos."""
 
 from __future__ import annotations
 
@@ -44,7 +44,6 @@ def create_app() -> Flask:
     def healthz():
         return jsonify(
             status="ok",
-            model=MAAS_MODEL,
             maas_configured=bool(MAAS_KEY),
             base_path=BASE_PATH or "/",
         )
@@ -72,10 +71,9 @@ def create_app() -> Flask:
         if not MAAS_KEY:
             return jsonify(
                 reply=(
-                    "GLM-5.2 is not configured on this host. "
-                    "Set HUAWEI_MAAS_API_KEY in .env.local to enable live demos."
+                    "The live assistant is not configured on this host yet. "
+                    "Please try again later, or ask the demo host to enable the API key."
                 ),
-                model=None,
             )
 
         payload = {
@@ -87,10 +85,10 @@ def create_app() -> Flask:
         }
         try:
             reply = call_maas(payload)
-        except Exception as exc:  # noqa: BLE001
-            return jsonify(error=f"GLM call failed: {exc}"), 502
+        except Exception:  # noqa: BLE001
+            return jsonify(error="Assistant is temporarily unavailable. Please try again."), 502
 
-        return jsonify(reply=reply, model=MAAS_MODEL, scenario=scenario_id)
+        return jsonify(reply=reply, scenario=scenario_id)
 
     return app
 
@@ -119,7 +117,7 @@ def call_maas(payload: dict) -> str:
     msg = choice.get("message") or {}
     content = (msg.get("content") or "").strip()
     if not content:
-        raise RuntimeError("empty model response")
+        raise RuntimeError("empty model reply")
     return content
 
 
@@ -127,4 +125,4 @@ app = create_app()
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", "5090"))
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(host="0.0.0.0", port=port, debug=False)

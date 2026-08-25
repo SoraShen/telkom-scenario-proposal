@@ -98,6 +98,32 @@
     return row;
   }
 
+  function appendTyping() {
+    const row = document.createElement("div");
+    row.className = "chat-row bot thinking";
+    row.setAttribute("aria-label", "Assistant is thinking");
+
+    const av = document.createElement("div");
+    av.className = "chat-avatar bot";
+    av.innerHTML = `<img src="${basePath}/static/img/bot-avatar.gif" alt="" width="36" height="42" />`;
+    row.appendChild(av);
+
+    const shimmer = document.createElement("div");
+    shimmer.className = "thinking-shimmer";
+    shimmer.setAttribute("aria-hidden", "true");
+    shimmer.innerHTML = `
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="wave"></span>
+    `;
+    row.appendChild(shimmer);
+
+    messages.appendChild(row);
+    messages.scrollTop = messages.scrollHeight;
+    return row;
+  }
+
   function renderChips(scenario) {
     const sc = byId[scenario];
     chipsBox.innerHTML = "";
@@ -154,7 +180,7 @@
     histories[scenario] = histories[scenario] || [];
     histories[scenario].push({ role: "user", content: trimmed });
 
-    const typing = appendBubble("bot", "Thinking with GLM-5.2…", "typing");
+    const typing = appendTyping();
 
     try {
       const res = await fetch(apiChat, {

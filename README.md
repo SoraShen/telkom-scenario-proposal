@@ -19,7 +19,7 @@ Page framing: **non-network** (outside RAN / core optimisation).
 Keep: balance & bill, recharge, packages, FAQs, human agent transfer.  
 Replace troubleshooting with **one** of the two candidates after design + API readiness review.
 
-Each option includes highlights, a 5-turn journey, an API checklist, and a **GLM-5.2** live demo (Huawei Cloud MaaS, mocked backends).
+Each option includes highlights, a 5-turn journey, an API checklist, and a live assistant demo (Huawei Cloud MaaS, mocked backends).
 
 ## Run locally
 

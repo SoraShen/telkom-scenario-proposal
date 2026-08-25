@@ -170,14 +170,16 @@
   <div class="telkom-chat" id="telkom-chat">
     <div class="chat-panel" id="chat-panel" role="dialog" aria-label="Telkom assistant" aria-hidden="true">
       <div class="chat-header">
-        <img
-          class="chat-header-logo"
-          src="{{ base_path }}/static/img/telkom-logo-on-blue.png"
-          alt="Telkom"
-          width="120"
-          height="31"
-        />
-        <span id="chat-status" class="chat-status">Online · Roaming</span>
+        <div class="chat-header-brand">
+          <img
+            class="chat-header-logo"
+            src="{{ base_path }}/static/img/telkom-logo-on-blue.png"
+            alt="Telkom"
+            width="120"
+            height="31"
+          />
+          <span id="chat-status" class="chat-status">Online · Roaming</span>
+        </div>
         <button type="button" class="chat-icon-btn" id="chat-close" title="Close" aria-label="Close">×</button>
       </div>
       <div class="chat-messages" id="chat-messages" aria-live="polite"></div>
