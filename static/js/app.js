@@ -8,9 +8,9 @@
 
   const GREETINGS = {
     roaming:
-      "Hi — I can help with international roaming from trip planning to your bill. Tap Play journey for a 5-turn demo, or pick a prompt.",
+      "Hi — I can help with international roaming from trip planning to your bill. Tap a journey step prompt below, or Play in demo.",
     security:
-      "Hi — I can help protect your SIM: block, unblock, PUK, or SIM swap. I’ll verify your identity first. Tap Play journey for the full arc.",
+      "Hi — I can help protect your SIM: block, unblock, PUK, or SIM swap. I’ll verify identity first. Tap Play in demo for the full arc.",
   };
 
   /** @type {Record<string, {role:string, content:string}[]>} */
@@ -37,7 +37,7 @@
   }
 
   function markStep(scenario, index, state) {
-    const steps = document.querySelectorAll(`#steps-${scenario} li`);
+    const steps = document.querySelectorAll(`#steps-${scenario} .timeline-step`);
     steps.forEach((node, i) => {
       node.classList.remove("active", "done");
       if (state === "reset") return;
@@ -70,15 +70,14 @@
     playing[scenario] = false;
     histories[scenario] = [];
     const box = el(`msg-${scenario}`);
-    box.innerHTML = "";
+    if (box) box.innerHTML = "";
     setTurn(scenario, "");
     markStep(scenario, 0, "reset");
     appendBubble(scenario, "bot", GREETINGS[scenario] || "How can I help?");
-    const playBtn = document.querySelector(`.play-journey[data-play="${scenario}"]`);
-    if (playBtn) {
+    document.querySelectorAll(`.play-journey[data-play="${scenario}"]`).forEach((playBtn) => {
       playBtn.disabled = false;
-      playBtn.textContent = "Play journey";
-    }
+      playBtn.textContent = "Play in demo";
+    });
   }
 
   async function send(scenario, text, opts = {}) {
@@ -124,7 +123,9 @@
     } finally {
       busy[scenario] = false;
       if (btn) btn.disabled = false;
-      if (input && !playing[scenario]) input.focus();
+      if (input && !playing[scenario] && window.matchMedia("(pointer: fine)").matches) {
+        input.focus();
+      }
     }
   }
 
@@ -132,31 +133,38 @@
     const sc = byId[scenario];
     if (!sc || playing[scenario] || busy[scenario]) return;
     playing[scenario] = true;
-    const playBtn = document.querySelector(`.play-journey[data-play="${scenario}"]`);
-    if (playBtn) {
+    document.querySelectorAll(`.play-journey[data-play="${scenario}"]`).forEach((playBtn) => {
       playBtn.disabled = true;
       playBtn.textContent = "Playing…";
+    });
+
+    const demo = document.querySelector(`#opt-${scenario} .demo`);
+    if (demo) {
+      demo.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
 
-    // Fresh arc
     histories[scenario] = [];
     el(`msg-${scenario}`).innerHTML = "";
     appendBubble(
       scenario,
       "system",
-      `Playing ${sc.journey.length}-turn journey — watch the highlights light up.`
+      `Playing ${sc.journey.length}-turn journey — timeline steps sync as we go.`
     );
 
     for (let i = 0; i < sc.journey.length; i += 1) {
       if (!playing[scenario]) break;
       const step = sc.journey[i];
       markStep(scenario, i, "active");
+      const stepNode = document.querySelector(
+        `#steps-${scenario} .timeline-step[data-step-index="${i}"]`
+      );
+      stepNode?.scrollIntoView({ behavior: "smooth", block: "nearest" });
       setTurn(scenario, `${step.label} · ${step.highlight}`);
       appendBubble(scenario, "system", `Highlight: ${step.highlight}`);
       const reply = await send(scenario, step.user, { highlight: step.highlight });
       markStep(scenario, i, reply ? "done" : "active");
       if (!reply) break;
-      await new Promise((r) => setTimeout(r, 350));
+      await new Promise((r) => setTimeout(r, 280));
     }
 
     if (playing[scenario]) {
@@ -165,13 +173,34 @@
       appendBubble(scenario, "system", "Journey complete — reset anytime or keep chatting.");
     }
     playing[scenario] = false;
-    if (playBtn) {
+    document.querySelectorAll(`.play-journey[data-play="${scenario}"]`).forEach((playBtn) => {
       playBtn.disabled = false;
       playBtn.textContent = "Replay journey";
-    }
+    });
   }
 
-  document.querySelectorAll(".option").forEach((node) => {
+  function setupReveal() {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const nodes = document.querySelectorAll(".reveal-block, .reveal-step");
+    if (reduce || !("IntersectionObserver" in window)) {
+      nodes.forEach((n) => n.classList.add("is-visible"));
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            io.unobserve(entry.target);
+          }
+        });
+      },
+      { root: null, rootMargin: "0px 0px -12% 0px", threshold: 0.18 }
+    );
+    nodes.forEach((n) => io.observe(n));
+  }
+
+  document.querySelectorAll(".scenario").forEach((node) => {
     reset(node.dataset.scenario);
   });
 
@@ -188,7 +217,11 @@
       const scenario = chip.dataset.scenario;
       const sc = byId[scenario];
       const step = sc?.journey?.find((j) => j.user === chip.dataset.text);
-      send(scenario, chip.dataset.text, { highlight: step?.highlight || null });
+      const idx = sc?.journey?.findIndex((j) => j.user === chip.dataset.text);
+      if (typeof idx === "number" && idx >= 0) markStep(scenario, idx, "active");
+      send(scenario, chip.dataset.text, { highlight: step?.highlight || null }).then((ok) => {
+        if (ok && typeof idx === "number" && idx >= 0) markStep(scenario, idx, "done");
+      });
     });
   });
 
@@ -200,4 +233,6 @@
       send(scenario, String(text || ""));
     });
   });
+
+  setupReveal();
 })();
