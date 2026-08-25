@@ -6,7 +6,7 @@
   <title>Telkom · Choose One Non-Network Journey</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Poppins:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="{{ base_path }}/static/css/style.css" />
 </head>
 <body data-base-path="{{ base_path }}">
@@ -170,20 +170,28 @@
   <div class="telkom-chat" id="telkom-chat">
     <div class="chat-panel" id="chat-panel" role="dialog" aria-label="Telkom assistant" aria-hidden="true">
       <div class="chat-header">
-        <img src="{{ base_path }}/static/img/chat-fab.svg" alt="" width="40" height="36" />
-        <div class="chat-header-text">
-          <strong>Telkom Assistant</strong>
-          <span id="chat-status">Online · Roaming</span>
-        </div>
-        <div class="chat-header-actions">
-          <button type="button" class="chat-icon-btn" id="chat-close" title="Close" aria-label="Close">×</button>
-        </div>
+        <img
+          class="chat-header-logo"
+          src="{{ base_path }}/static/img/telkom-logo-on-blue.png"
+          alt="Telkom"
+          width="120"
+          height="31"
+        />
+        <span id="chat-status" class="chat-status">Online · Roaming</span>
+        <button type="button" class="chat-icon-btn" id="chat-close" title="Close" aria-label="Close">×</button>
       </div>
       <div class="chat-messages" id="chat-messages" aria-live="polite"></div>
       <div class="chat-chips" id="chat-chips"></div>
       <form class="chat-composer" id="chat-form">
-        <input id="chat-input" type="text" autocomplete="off" enterkeyhint="send" placeholder="Message the assistant…" aria-label="Message" required />
-        <button class="chat-send" type="submit">Send</button>
+        <div class="input-shell">
+          <input id="chat-input" type="text" autocomplete="off" enterkeyhint="send" placeholder="Type your query to get started..." aria-label="Message" required />
+          <button class="chat-send" type="submit" aria-label="Send">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21.4 11.1 4.6 3.3a.9.9 0 0 0-1.25 1.05L5.2 11.2a.9.9 0 0 0 .72.65l7.6 1.15-7.6 1.15a.9.9 0 0 0-.72.65l-1.85 6.85A.9.9 0 0 0 4.6 22.7l16.8-7.8a2.1 2.1 0 0 0 0-3.8z"
+                    fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
       </form>
     </div>
     <button type="button" class="chat-fab" id="chat-fab" aria-label="Open Telkom assistant" aria-expanded="false">

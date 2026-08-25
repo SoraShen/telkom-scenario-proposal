@@ -63,6 +63,16 @@
   }
 
   function appendBubble(role, text, extraClass, highlight) {
+    const row = document.createElement("div");
+    row.className = `chat-row ${role}`;
+
+    if (role === "bot") {
+      const av = document.createElement("div");
+      av.className = "chat-avatar bot";
+      av.innerHTML = `<img src="${basePath}/static/img/bot-avatar.gif" alt="" width="36" height="42" />`;
+      row.appendChild(av);
+    }
+
     const div = document.createElement("div");
     div.className = `bubble ${role}${extraClass ? " " + extraClass : ""}`;
     if (highlight && role === "bot") {
@@ -74,9 +84,18 @@
     const body = document.createElement("div");
     body.textContent = text;
     div.appendChild(body);
-    messages.appendChild(div);
+    row.appendChild(div);
+
+    if (role === "user") {
+      const av = document.createElement("div");
+      av.className = "chat-avatar user";
+      av.innerHTML = `<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="24" fill="#ffffff"/><circle cx="24" cy="19" r="7.6" fill="#0a97ff"/><path d="M8.6 40.4a15.8 15.8 0 0 1 30.8 0 24 24 0 0 1-30.8 0z" fill="#0a97ff"/></svg>`;
+      row.appendChild(av);
+    }
+
+    messages.appendChild(row);
     messages.scrollTop = messages.scrollHeight;
-    return div;
+    return row;
   }
 
   function renderChips(scenario) {
@@ -128,6 +147,7 @@
 
     const sendBtn = form?.querySelector(".chat-send");
     if (input && !opts.keepInput) input.value = "";
+    if (typeof syncSendBtn === "function") syncSendBtn();
     if (sendBtn) sendBtn.disabled = true;
 
     appendBubble("user", trimmed);
@@ -241,11 +261,20 @@
     }
   }
 
+  const sendBtn = form?.querySelector(".chat-send");
+
+  function syncSendBtn() {
+    if (!sendBtn || !input) return;
+    const has = Boolean(input.value.trim());
+    sendBtn.classList.toggle("is-active", has);
+  }
+
   // init
   scenarios.forEach((s) => {
     histories[s.id] = [];
   });
   resetConversation(activeScenario);
+  syncSendBtn();
 
   document.querySelectorAll(".switcher-btn").forEach((btn) => {
     btn.addEventListener("click", () => switchScenario(btn.dataset.scenario));
@@ -258,8 +287,10 @@
   fab?.addEventListener("click", () => openChat());
   closeBtn?.addEventListener("click", () => closeChat());
 
+  input?.addEventListener("input", syncSendBtn);
+
   form?.addEventListener("submit", (e) => {
     e.preventDefault();
-    send(String(new FormData(form).get("text") || ""));
+    send(input?.value || "").then(() => syncSendBtn());
   });
 })();
