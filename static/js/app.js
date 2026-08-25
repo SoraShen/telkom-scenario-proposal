@@ -3,6 +3,8 @@
   /** @type {Array<any>} */
   const scenarios = dataNode ? JSON.parse(dataNode.textContent || "[]") : [];
   const byId = Object.fromEntries(scenarios.map((s) => [s.id, s]));
+  const basePath = (document.body?.dataset?.basePath || "").replace(/\/$/, "");
+  const apiChat = `${basePath}/api/chat`;
 
   const GREETINGS = {
     roaming:
@@ -97,7 +99,7 @@
     const typing = appendBubble(scenario, "bot", "Thinking with GLM-5.2…", "typing");
 
     try {
-      const res = await fetch("/api/chat", {
+      const res = await fetch(apiChat, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

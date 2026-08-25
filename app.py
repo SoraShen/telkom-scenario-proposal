@@ -21,6 +21,8 @@ load_dotenv(ROOT / ".env")
 MAAS_BASE = os.environ.get("HUAWEI_MAAS_BASE_URL", "https://api-ap-southeast-1.modelarts-maas.com/v2").rstrip("/")
 MAAS_KEY = os.environ.get("HUAWEI_MAAS_API_KEY", "")
 MAAS_MODEL = os.environ.get("HUAWEI_MAAS_GLM_MODEL", "glm-5.2")
+# Public URL prefix when reverse-proxied, e.g. /telkom-scenarios (no trailing slash)
+BASE_PATH = os.environ.get("APPLICATION_ROOT", os.environ.get("PUBLIC_BASE_PATH", "")).rstrip("/")
 
 SSL_CTX = ssl.create_default_context()
 SSL_CTX.check_hostname = False
@@ -30,13 +32,22 @@ SSL_CTX.verify_mode = ssl.CERT_NONE
 def create_app() -> Flask:
     app = Flask(__name__)
 
+    @app.context_processor
+    def inject_base():
+        return {"base_path": BASE_PATH}
+
     @app.get("/")
     def index():
         return render_template("index.html", scenarios=list(SCENARIOS.values()))
 
     @app.get("/healthz")
     def healthz():
-        return jsonify(status="ok", model=MAAS_MODEL, maas_configured=bool(MAAS_KEY))
+        return jsonify(
+            status="ok",
+            model=MAAS_MODEL,
+            maas_configured=bool(MAAS_KEY),
+            base_path=BASE_PATH or "/",
+        )
 
     @app.post("/api/chat")
     def api_chat():

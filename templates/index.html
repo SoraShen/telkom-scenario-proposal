@@ -7,9 +7,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/css/style.css" />
+  <link rel="stylesheet" href="{{ base_path }}/static/css/style.css" />
 </head>
-<body>
+<body data-base-path="{{ base_path }}">
   <div class="atmosphere" aria-hidden="true"></div>
 
   <header class="topbar">
@@ -191,6 +191,6 @@
   </main>
 
   <script id="scenario-data" type="application/json">{{ scenarios | tojson }}</script>
-  <script src="/static/js/app.js"></script>
+  <script src="{{ base_path }}/static/js/app.js"></script>
 </body>
 </html>
