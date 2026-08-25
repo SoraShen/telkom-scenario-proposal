@@ -221,6 +221,16 @@ body {
   background: rgba(145, 226, 0, 0.22);
   color: var(--lime-deep);
 }
+.pick-if {
+  margin: 0 0 1rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 12px;
+  background: rgba(0, 153, 255, 0.07);
+  border: 1px solid rgba(0, 153, 255, 0.16);
+  color: var(--slate);
+  font-size: 0.9rem;
+}
+.pick-if strong { color: var(--navy); }
 .meta { margin: 0 0 1.1rem; display: grid; gap: 0.7rem; }
 .meta dt {
   font-size: 0.7rem;
@@ -232,20 +242,36 @@ body {
 .meta dd { margin: 0.12rem 0 0; color: var(--slate); }
 
 .highlights h4,
-.journey-head h4 {
+.journey-head h4,
+.api-box h4 {
   margin: 0 0 0.55rem;
   font-family: var(--display);
   font-size: 0.95rem;
   letter-spacing: -0.02em;
   color: var(--navy);
 }
+.api-box {
+  margin: 0 0 1.15rem;
+  padding: 0.85rem 0.9rem;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 82, 136, 0.18);
+  background: linear-gradient(165deg, rgba(231, 246, 255, 0.9), rgba(255, 255, 255, 0.95));
+}
+.api-note {
+  margin: 0 0 0.7rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+.api-box ul,
 .highlights ul {
   list-style: none;
-  margin: 0 0 1.15rem;
+  margin: 0;
   padding: 0;
   display: grid;
   gap: 0.55rem;
 }
+.highlights ul { margin: 0 0 1.15rem; }
+.api-box li,
 .highlights li {
   display: grid;
   gap: 0.1rem;
@@ -254,7 +280,10 @@ body {
   background: rgba(0, 153, 255, 0.05);
   border-radius: 0 10px 10px 0;
 }
+.api-box li { border-left-color: var(--blue-deep); background: rgba(0, 82, 136, 0.05); }
+.api-box strong,
 .highlights strong { color: var(--ink); font-size: 0.9rem; }
+.api-box span,
 .highlights span { color: var(--muted); font-size: 0.84rem; }
 
 .journey-head {

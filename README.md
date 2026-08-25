@@ -1,15 +1,25 @@
-# Telkom BSS-First Scenario Proposal
+# Telkom · Choose One Non-Network Journey
 
-Customer-facing proposal page to replace **network troubleshooting** with two BSS/CRM/charging journeys, each with highlights, a **5-turn user journey**, and a **GLM-5.2** live demo (Huawei Cloud MaaS). Brand colours follow [telkom.co.za](https://www.telkom.co.za/) (`#0099FF` / `#91E200` / `#003F6A`).
+Customer review page: pick **either International Roaming or SIM & Account Security** to replace **network troubleshooting**.  
+Purpose: validate **experience design** and confirm whether Telkom can **provide the listed APIs**. Not a production go-live.
 
-## Verdict (short)
+Brand colours follow [telkom.co.za](https://www.telkom.co.za/) (`#0099FF` / `#91E200` / `#003F6A`).
 
-| Option | Fit | Note |
-|--------|-----|------|
-| International Roaming | **Ship (P0)** | Pure BSS/OCS |
-| SIM & Account Security | **Ship (P0)** | Reuse existing SIM self-care APIs — do not pitch new HLR/HSS work |
+## Why not “BSS-first”?
 
-Keep: balance & bill, recharge, packages, FAQs, human agent transfer.
+| Candidate | Domain |
+|-----------|--------|
+| International Roaming | BSS/CRM + OCS/charging + CDR |
+| SIM & Account Security | CRM/RICA + SIM lifecycle / self-care (reuse WhatsApp path) — **not pure BSS** |
+
+Page framing: **non-network** (outside RAN / core optimisation).
+
+## Choose one
+
+Keep: balance & bill, recharge, packages, FAQs, human agent transfer.  
+Replace troubleshooting with **one** of the two candidates after design + API readiness review.
+
+Each option includes highlights, a 5-turn journey, an API checklist, and a **GLM-5.2** live demo (Huawei Cloud MaaS, mocked backends).
 
 ## Run locally
 
@@ -27,4 +37,4 @@ Open http://127.0.0.1:5090
 ## API
 
 - `GET /healthz`
-- `POST /api/chat` `{ "scenario": "roaming|security|sharing", "messages": [{role, content}] }`
+- `POST /api/chat` `{ "scenario": "roaming|security", "messages": [{role, content}] }`

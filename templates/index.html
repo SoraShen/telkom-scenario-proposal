@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Telkom · BSS-First Chatbot Scenarios</title>
+  <title>Telkom · Choose One Non-Network Journey</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
@@ -18,33 +18,35 @@
       <span class="brand-name">Telkom</span>
       <span class="tagline">Possible Begins Here</span>
     </div>
-    <p class="topbar-note">Huawei Cloud demo · BSS / CRM / charging only</p>
+    <p class="topbar-note">Huawei Cloud demo · design &amp; API readiness review</p>
   </header>
 
   <main>
     <section class="hero">
-      <p class="eyebrow">Scenario proposal</p>
-      <h1>Two BSS-first journeys to replace network troubleshooting</h1>
+      <p class="eyebrow">Scenario choice · outside RAN / core</p>
+      <h1>Choose one non-network journey to replace troubleshooting</h1>
       <p class="lede">
         Keep balance, recharge, packages, FAQs, and human handoff.
-        Add <strong>Roaming</strong> and <strong>SIM Security</strong> — commercial self-service that does not wait on the network programme.
+        Pick <strong>either Roaming or SIM Security</strong> as the replacement for network troubleshooting.
+        This page is for you to review the experience design and confirm whether the listed APIs can be provided — not a production go-live.
       </p>
       <div class="hero-cta">
-        <a class="btn primary" href="#options">Open live demos</a>
-        <a class="btn ghost" href="#recommendation">Fitness check</a>
+        <a class="btn primary" href="#options">Compare candidates</a>
+        <a class="btn ghost" href="#how-to">How to use this demo</a>
       </div>
     </section>
 
-    <section class="strip" id="recommendation">
+    <section class="strip" id="how-to">
       <div class="strip-inner">
-        <h2>Fitness check</h2>
+        <h2>How to use this demo</h2>
         <p>
-          Both options deliver tangible value without a new radio/core programme.
-          Roaming is pure BSS/OCS. Security reuses the same SIM lifecycle / self-care APIs already used for WhatsApp SIM swap — not a new HLR project.
+          Try both live demos (or tap <strong>Play journey</strong>). Check each <strong>API dependencies to confirm</strong> list.
+          Then choose <strong>one</strong> candidate to replace network troubleshooting.
         </p>
         <ul class="fit-list">
-          <li><span class="dot go"></span><strong>P0:</strong> International Roaming Assistant</li>
-          <li><span class="dot go"></span><strong>P0:</strong> SIM &amp; Account Security (existing self-care APIs)</li>
+          <li><span class="dot go"></span><strong>Review design:</strong> Is the multi-turn journey clear and on-brand?</li>
+          <li><span class="dot go"></span><strong>Confirm APIs:</strong> Can Telkom expose / integrate the listed dependencies?</li>
+          <li><span class="dot stay"></span><strong>Choose one:</strong> Roaming <em>or</em> SIM Security — not both in this replacement slot</li>
           <li><span class="dot stay"></span><strong>Keep:</strong> Balance · Recharge · Packages · FAQs · Agent transfer</li>
         </ul>
       </div>
@@ -52,8 +54,8 @@
 
     <section class="options" id="options">
       <header class="section-head">
-        <h2>Proposals · multi-turn journeys · GLM-5.2 live demos</h2>
-        <p>Each option shows its highlights, a 5-turn user journey, and a live chat powered by Huawei Cloud MaaS <em>glm-5.2</em>.</p>
+        <h2>Two candidates · pick one · GLM-5.2 live demos</h2>
+        <p>Each card is a replacement option for troubleshooting: highlights, 5-turn journey, API checklist, and a mocked live chat on Huawei Cloud MaaS <em>glm-5.2</em>.</p>
       </header>
 
       <div class="option-grid">
@@ -63,6 +65,7 @@
             <p class="tag">{{ s.tag }}</p>
             <h3>{{ s.title }}</h3>
             <p class="verdict tone-{{ s.verdict_tone }}">{{ s.verdict }}</p>
+            <p class="pick-if"><strong>Pick this if</strong> {{ s.pick_if }}</p>
 
             <dl class="meta">
               <div><dt>Pain</dt><dd>{{ s.pain }}</dd></div>
@@ -70,6 +73,19 @@
               <div><dt>Systems</dt><dd>{{ s.systems | join(' · ') }}</dd></div>
               <div><dt>Network</dt><dd>{{ s.network_touch }}</dd></div>
             </dl>
+
+            <div class="api-box">
+              <h4>API dependencies to confirm</h4>
+              <p class="api-note">{{ s.api_note }}</p>
+              <ul>
+                {% for api in s.api_dependencies %}
+                <li>
+                  <strong>{{ api.name }}</strong>
+                  <span>{{ api.detail }}</span>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
 
             <div class="highlights">
               <h4>Highlights to showcase</h4>
@@ -127,38 +143,42 @@
 
     <section class="compare">
       <header class="section-head">
-        <h2>Side-by-side</h2>
-        <p>Customer readout snapshot.</p>
+        <h2>Decision aid · pick one</h2>
+        <p>Use this when choosing which journey replaces network troubleshooting.</p>
       </header>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
               <th>Aspect</th>
-              <th>Roaming</th>
-              <th>Security</th>
+              <th>Option A · Roaming</th>
+              <th>Option B · Security</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>BSS-only purity</td>
-              <td>High</td>
-              <td>High (reuse self-care APIs)</td>
+              <td>Primary pain</td>
+              <td>Abroad cost &amp; data anxiety</td>
+              <td>Lost phone / PIN / SIM swap urgency</td>
             </tr>
             <tr>
-              <td>Headline highlight</td>
-              <td>R194 week saving vs daily pass</td>
-              <td>Block in seconds after IDV</td>
+              <td>System domain</td>
+              <td>BSS / CRM + OCS + CDR</td>
+              <td>CRM / RICA + SIM self-care</td>
             </tr>
             <tr>
-              <td>Revenue / retention</td>
-              <td>Bundle attach abroad</td>
-              <td>Fraud stop + churn prevention</td>
+              <td>API complexity</td>
+              <td>Catalogue + activate + usage + bill</td>
+              <td>IDV + block/unblock + PUK + swap handoff</td>
             </tr>
             <tr>
-              <td>Suggested phase</td>
-              <td>P0</td>
-              <td>P0</td>
+              <td>Pick when</td>
+              <td>Roaming attach &amp; bill clarity matter most</td>
+              <td>Self-serve security / store deflection matters most</td>
+            </tr>
+            <tr>
+              <td>Replacement slot</td>
+              <td colspan="2">One of these replaces troubleshooting — keep balance, recharge, packages, FAQs, agent</td>
             </tr>
           </tbody>
         </table>
@@ -166,7 +186,7 @@
     </section>
 
     <footer class="footer">
-      <p>Huawei Cloud demo environment for Telkom customer reference — not a live production service. Brand colours sampled from telkom.co.za.</p>
+      <p>Huawei Cloud demo for Telkom design &amp; API readiness review — mocked backends, not a live production service. Brand colours sampled from telkom.co.za.</p>
     </footer>
   </main>
 

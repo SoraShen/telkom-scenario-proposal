@@ -1,4 +1,4 @@
-"""Scenario catalogue for the Telkom BSS-first proposal demos."""
+"""Scenario catalogue for the Telkom choose-one scenario review demos."""
 
 from __future__ import annotations
 
@@ -9,13 +9,37 @@ SCENARIOS: dict[str, dict] = {
         "id": "roaming",
         "title": "International Roaming Assistant",
         "short": "Roaming",
-        "tag": "Option 1 · Recommended · P0",
-        "verdict": "Strong fit · BSS / OCS only",
+        "tag": "Option A · Candidate",
+        "verdict": "BSS / CRM + OCS / charging",
         "verdict_tone": "go",
+        "pick_if": "You want roaming revenue attach, clearer abroad spend, and bill transparency — with no RAN/core work.",
         "pain": "Unclear roaming costs and running out of data abroad",
         "value": "Pre-trip sell → in-trip top-up → post-trip bill clarity",
         "systems": ["BSS/CRM", "OCS / charging", "CDR retrieval"],
         "network_touch": "None — no radio or core involvement",
+        "api_note": "Live demo uses mocked BSS data. For production, Telkom confirms these APIs can be provided / integrated.",
+        "api_dependencies": [
+            {
+                "name": "Customer profile & plan lookup",
+                "detail": "MSISDN → account type, current plan, eligibility for roaming products",
+            },
+            {
+                "name": "Roaming product catalogue",
+                "detail": "Destination/duration-aware daily vs weekly vs PAYG offers and prices",
+            },
+            {
+                "name": "Roaming bundle activate / deactivate",
+                "detail": "BSS order to turn a selected roaming pass on or off",
+            },
+            {
+                "name": "OCS usage & balance query",
+                "detail": "In-trip remaining data / allowance while roaming",
+            },
+            {
+                "name": "CDR / bill itemisation",
+                "detail": "Post-trip roaming charge breakdown for the bill period",
+            },
+        ],
         "highlights": [
             {
                 "title": "Trip-aware discovery",
@@ -118,13 +142,33 @@ SCENARIOS: dict[str, dict] = {
         "id": "security",
         "title": "SIM & Account Security",
         "short": "Security",
-        "tag": "Option 2 · Recommended · P0",
-        "verdict": "Strong fit · reuse existing SIM self-care APIs",
+        "tag": "Option B · Candidate",
+        "verdict": "CRM / RICA + SIM self-care (not pure BSS)",
         "verdict_tone": "go",
+        "pick_if": "You want lost-phone / PIN / SIM-swap self-service without waiting on a new network programme.",
         "pain": "Lost phone, PIN lock, urgent SIM protection without a store visit",
         "value": "Verify → block / unblock / PUK / SIM swap in one chat thread",
         "systems": ["CRM + RICA IDV", "SIM lifecycle / self-care APIs", "WhatsApp SIM-swap path"],
-        "network_touch": "No new HLR project — same lifecycle APIs already used by WhatsApp",
+        "network_touch": "No new HLR project — reuse lifecycle APIs already used by WhatsApp",
+        "api_note": "Live demo uses mocked self-care data. For production, Telkom confirms these APIs can be provided / integrated.",
+        "api_dependencies": [
+            {
+                "name": "RICA / identity verification",
+                "detail": "Match ID / security answers before any sensitive SIM action",
+            },
+            {
+                "name": "SIM block / unblock",
+                "detail": "Suspend or restore the MSISDN via existing SIM lifecycle / self-care APIs",
+            },
+            {
+                "name": "PUK retrieval",
+                "detail": "Return PUK only after successful identity proof",
+            },
+            {
+                "name": "SIM swap handoff",
+                "detail": "Start or deep-link the same WhatsApp / self-care SIM-swap path Telkom already runs",
+            },
+        ],
         "highlights": [
             {
                 "title": "Identity-first gate",
@@ -199,7 +243,7 @@ SCENARIOS: dict[str, dict] = {
 
 SYSTEM_PREAMBLE = """You are Telkom SA's digital assistant in a Huawei Cloud customer demo.
 Speak concise, warm South African English. Never invent real backend outages.
-This is a DEMO: use the provided MOCK_BSS JSON as ground truth and simulate successful BSS actions.
+This is a DESIGN / API-READINESS DEMO: use the provided MOCK_BSS JSON as ground truth and simulate successful backend actions.
 When you activate, block, unblock, or retrieve PUK, invent a short confirmation reference like TK-ROAM-4821 or TK-SIM-1194.
 Keep replies short (2–5 sentences). Prefer clear next steps and one question at a time.
 Surface the SCENARIO HIGHLIGHTS naturally in your wording (savings, confirmation refs, identity gate, etc.).
