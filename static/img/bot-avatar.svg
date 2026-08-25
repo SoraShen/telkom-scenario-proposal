@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-label="Telkom assistant">
+  <circle cx="32" cy="32" r="32" fill="#0099FF"/>
+  <circle cx="32" cy="32" r="26" fill="#005288"/>
+  <path d="M20 22h24v5.2H36.2V42h-8.4V27.2H20V22z" fill="#FFFFFF"/>
+  <circle cx="46" cy="18" r="5" fill="#91E200"/>
+</svg>

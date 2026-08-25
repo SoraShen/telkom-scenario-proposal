@@ -8,32 +8,45 @@
 
   const GREETINGS = {
     roaming:
-      "Hi — I can help with international roaming from trip planning to your bill. Tap a journey step prompt below, or Play in demo.",
+      "Hi — I’m the Telkom roaming assistant. Ask about a trip, compare bundles, or tap Play journey on the page.",
     security:
-      "Hi — I can help protect your SIM: block, unblock, PUK, or SIM swap. I’ll verify identity first. Tap Play in demo for the full arc.",
+      "Hi — I can help with SIM security: block, unblock, PUK, or SIM swap. I’ll verify identity first.",
   };
 
+  let activeScenario = scenarios[0]?.id || "roaming";
   /** @type {Record<string, {role:string, content:string}[]>} */
   const histories = {};
   /** @type {Record<string, boolean>} */
   const busy = {};
-  /** @type {Record<string, boolean>} */
-  const playing = {};
+  let playing = false;
 
-  function el(id) {
-    return document.getElementById(id);
+  const panel = document.getElementById("chat-panel");
+  const fab = document.getElementById("chat-fab");
+  const closeBtn = document.getElementById("chat-close");
+  const messages = document.getElementById("chat-messages");
+  const chipsBox = document.getElementById("chat-chips");
+  const form = document.getElementById("chat-form");
+  const input = document.getElementById("chat-input");
+  const statusEl = document.getElementById("chat-status");
+
+  function isOpen() {
+    return panel?.classList.contains("is-open");
   }
 
-  function setTurn(scenario, text) {
-    const pill = el(`turn-${scenario}`);
-    if (!pill) return;
-    if (!text) {
-      pill.hidden = true;
-      pill.textContent = "";
-      return;
-    }
-    pill.hidden = false;
-    pill.textContent = text;
+  function openChat() {
+    if (!panel || !fab) return;
+    panel.classList.add("is-open");
+    panel.setAttribute("aria-hidden", "false");
+    fab.classList.add("is-hidden");
+    fab.setAttribute("aria-expanded", "true");
+  }
+
+  function closeChat() {
+    if (!panel || !fab) return;
+    panel.classList.remove("is-open");
+    panel.setAttribute("aria-hidden", "true");
+    fab.classList.remove("is-hidden");
+    fab.setAttribute("aria-expanded", "false");
   }
 
   function markStep(scenario, index, state) {
@@ -42,14 +55,14 @@
       node.classList.remove("active", "done");
       if (state === "reset") return;
       if (i < index) node.classList.add("done");
-      if (i === index && state === "active") node.classList.add("active");
-      if (i === index && state === "done") node.classList.add("done");
+      if (i === index && (state === "active" || state === "done")) {
+        node.classList.add(state === "done" ? "done" : "active");
+      }
       if (state === "all-done") node.classList.add("done");
     });
   }
 
-  function appendBubble(scenario, role, text, extraClass, highlight) {
-    const box = el(`msg-${scenario}`);
+  function appendBubble(role, text, extraClass, highlight) {
     const div = document.createElement("div");
     div.className = `bubble ${role}${extraClass ? " " + extraClass : ""}`;
     if (highlight && role === "bot") {
@@ -61,178 +74,192 @@
     const body = document.createElement("div");
     body.textContent = text;
     div.appendChild(body);
-    box.appendChild(div);
-    box.scrollTop = box.scrollHeight;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
     return div;
   }
 
-  function reset(scenario) {
-    playing[scenario] = false;
-    histories[scenario] = [];
-    const box = el(`msg-${scenario}`);
-    if (box) box.innerHTML = "";
-    setTurn(scenario, "");
-    markStep(scenario, 0, "reset");
-    appendBubble(scenario, "bot", GREETINGS[scenario] || "How can I help?");
-    document.querySelectorAll(`.play-journey[data-play="${scenario}"]`).forEach((playBtn) => {
-      playBtn.disabled = false;
-      playBtn.textContent = "Play in demo";
+  function renderChips(scenario) {
+    const sc = byId[scenario];
+    chipsBox.innerHTML = "";
+    (sc?.chips || []).forEach((text) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "chip";
+      btn.textContent = text;
+      btn.addEventListener("click", () => {
+        const step = sc.journey?.find((j) => j.user === text);
+        const idx = sc.journey?.findIndex((j) => j.user === text);
+        if (typeof idx === "number" && idx >= 0) markStep(scenario, idx, "active");
+        send(text, { highlight: step?.highlight || null }).then((ok) => {
+          if (ok && typeof idx === "number" && idx >= 0) markStep(scenario, idx, "done");
+        });
+      });
+      chipsBox.appendChild(btn);
     });
   }
 
-  async function send(scenario, text, opts = {}) {
+  function resetConversation(scenario, opts = {}) {
+    histories[scenario] = [];
+    markStep(scenario, 0, "reset");
+    if (scenario === activeScenario) {
+      messages.innerHTML = "";
+      appendBubble("bot", GREETINGS[scenario] || "How can I help?");
+      renderChips(scenario);
+      if (statusEl) {
+        const label = byId[scenario]?.short || scenario;
+        statusEl.textContent = `Online · ${label}`;
+      }
+      document.querySelectorAll(".play-journey").forEach((btn) => {
+        if (btn.dataset.play === scenario) {
+          btn.disabled = false;
+          btn.textContent = "Play journey";
+        }
+      });
+    }
+    if (opts.open) openChat();
+  }
+
+  async function send(text, opts = {}) {
+    const scenario = activeScenario;
     const trimmed = (text || "").trim();
     if (!trimmed || busy[scenario]) return null;
     busy[scenario] = true;
 
-    const form = document.querySelector(`form.composer[data-scenario="${scenario}"]`);
-    const input = form?.querySelector('input[name="text"]');
-    const btn = form?.querySelector("button.send");
+    const sendBtn = form?.querySelector(".chat-send");
     if (input && !opts.keepInput) input.value = "";
-    if (btn) btn.disabled = true;
+    if (sendBtn) sendBtn.disabled = true;
 
-    appendBubble(scenario, "user", trimmed);
+    appendBubble("user", trimmed);
     histories[scenario] = histories[scenario] || [];
     histories[scenario].push({ role: "user", content: trimmed });
 
-    const typing = appendBubble(scenario, "bot", "Thinking with GLM-5.2…", "typing");
+    const typing = appendBubble("bot", "Thinking with GLM-5.2…", "typing");
 
     try {
       const res = await fetch(apiChat, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          scenario,
-          messages: histories[scenario],
-        }),
+        body: JSON.stringify({ scenario, messages: histories[scenario] }),
       });
       const data = await res.json().catch(() => ({}));
       typing.remove();
       if (!res.ok) {
-        appendBubble(scenario, "system", data.error || `Error ${res.status}`);
+        appendBubble("system", data.error || `Error ${res.status}`);
         return null;
       }
       const reply = data.reply || "(empty reply)";
-      appendBubble(scenario, "bot", reply, null, opts.highlight || null);
+      appendBubble("bot", reply, null, opts.highlight || null);
       histories[scenario].push({ role: "assistant", content: reply });
       return reply;
     } catch (err) {
       typing.remove();
-      appendBubble(scenario, "system", String(err?.message || err));
+      appendBubble("system", String(err?.message || err));
       return null;
     } finally {
       busy[scenario] = false;
-      if (btn) btn.disabled = false;
-      if (input && !playing[scenario] && window.matchMedia("(pointer: fine)").matches) {
-        input.focus();
-      }
+      if (sendBtn) sendBtn.disabled = false;
     }
   }
 
   async function playJourney(scenario) {
     const sc = byId[scenario];
-    if (!sc || playing[scenario] || busy[scenario]) return;
-    playing[scenario] = true;
-    document.querySelectorAll(`.play-journey[data-play="${scenario}"]`).forEach((playBtn) => {
-      playBtn.disabled = true;
-      playBtn.textContent = "Playing…";
+    if (!sc || playing || busy[scenario]) return;
+    if (scenario !== activeScenario) switchScenario(scenario);
+    playing = true;
+
+    const playBtns = document.querySelectorAll(`.play-journey[data-play="${scenario}"]`);
+    playBtns.forEach((b) => {
+      b.disabled = true;
+      b.textContent = "Playing…";
     });
 
-    const demo = document.querySelector(`#opt-${scenario} .demo`);
-    if (demo) {
-      demo.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }
-
+    openChat();
     histories[scenario] = [];
-    el(`msg-${scenario}`).innerHTML = "";
-    appendBubble(
-      scenario,
-      "system",
-      `Playing ${sc.journey.length}-turn journey — timeline steps sync as we go.`
-    );
+    messages.innerHTML = "";
+    renderChips(scenario);
+    appendBubble("system", `Playing ${sc.journey.length}-turn ${sc.short} journey…`);
 
     for (let i = 0; i < sc.journey.length; i += 1) {
-      if (!playing[scenario]) break;
+      if (!playing) break;
       const step = sc.journey[i];
       markStep(scenario, i, "active");
-      const stepNode = document.querySelector(
-        `#steps-${scenario} .timeline-step[data-step-index="${i}"]`
-      );
-      stepNode?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      setTurn(scenario, `${step.label} · ${step.highlight}`);
-      appendBubble(scenario, "system", `Highlight: ${step.highlight}`);
-      const reply = await send(scenario, step.user, { highlight: step.highlight });
+      document
+        .querySelector(`#steps-${scenario} .timeline-step[data-step-index="${i}"]`)
+        ?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      appendBubble("system", `Highlight: ${step.highlight}`);
+      const reply = await send(step.user, { highlight: step.highlight });
       markStep(scenario, i, reply ? "done" : "active");
       if (!reply) break;
       await new Promise((r) => setTimeout(r, 280));
     }
 
-    if (playing[scenario]) {
+    if (playing) {
       markStep(scenario, sc.journey.length, "all-done");
-      setTurn(scenario, "Journey complete");
-      appendBubble(scenario, "system", "Journey complete — reset anytime or keep chatting.");
+      appendBubble("system", "Journey complete — keep chatting or switch option.");
     }
-    playing[scenario] = false;
-    document.querySelectorAll(`.play-journey[data-play="${scenario}"]`).forEach((playBtn) => {
-      playBtn.disabled = false;
-      playBtn.textContent = "Replay journey";
+    playing = false;
+    playBtns.forEach((b) => {
+      b.disabled = false;
+      b.textContent = "Replay journey";
     });
   }
 
-  function setupReveal() {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const nodes = document.querySelectorAll(".reveal-block, .reveal-step");
-    if (reduce || !("IntersectionObserver" in window)) {
-      nodes.forEach((n) => n.classList.add("is-visible"));
-      return;
+  function switchScenario(id) {
+    if (!byId[id] || id === activeScenario) {
+      // still ensure panel visible
+      if (byId[id]) activeScenario = id;
     }
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            io.unobserve(entry.target);
-          }
-        });
-      },
-      { root: null, rootMargin: "0px 0px -12% 0px", threshold: 0.18 }
-    );
-    nodes.forEach((n) => io.observe(n));
+    const prev = activeScenario;
+    if (playing && id !== prev) {
+      playing = false;
+    }
+    activeScenario = id;
+
+    document.querySelectorAll(".switcher-btn").forEach((btn) => {
+      const on = btn.dataset.scenario === id;
+      btn.classList.toggle("is-active", on);
+      btn.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    document.querySelectorAll(".scenario-panel").forEach((panelEl) => {
+      const on = panelEl.dataset.scenario === id;
+      panelEl.classList.toggle("is-active", on);
+      if (on) panelEl.removeAttribute("hidden");
+      else panelEl.setAttribute("hidden", "");
+    });
+
+    // restore or init conversation for this scenario
+    if (!histories[id] || histories[id].length === 0) {
+      resetConversation(id);
+    } else {
+      messages.innerHTML = "";
+      histories[id].forEach((m) => {
+        appendBubble(m.role === "user" ? "user" : "bot", m.content);
+      });
+      renderChips(id);
+      if (statusEl) statusEl.textContent = `Online · ${byId[id].short}`;
+    }
   }
 
-  document.querySelectorAll(".scenario").forEach((node) => {
-    reset(node.dataset.scenario);
+  // init
+  scenarios.forEach((s) => {
+    histories[s.id] = [];
   });
+  resetConversation(activeScenario);
 
-  document.querySelectorAll(".reset-btn").forEach((btn) => {
-    btn.addEventListener("click", () => reset(btn.dataset.reset));
+  document.querySelectorAll(".switcher-btn").forEach((btn) => {
+    btn.addEventListener("click", () => switchScenario(btn.dataset.scenario));
   });
 
   document.querySelectorAll(".play-journey").forEach((btn) => {
     btn.addEventListener("click", () => playJourney(btn.dataset.play));
   });
 
-  document.querySelectorAll(".chip").forEach((chip) => {
-    chip.addEventListener("click", () => {
-      const scenario = chip.dataset.scenario;
-      const sc = byId[scenario];
-      const step = sc?.journey?.find((j) => j.user === chip.dataset.text);
-      const idx = sc?.journey?.findIndex((j) => j.user === chip.dataset.text);
-      if (typeof idx === "number" && idx >= 0) markStep(scenario, idx, "active");
-      send(scenario, chip.dataset.text, { highlight: step?.highlight || null }).then((ok) => {
-        if (ok && typeof idx === "number" && idx >= 0) markStep(scenario, idx, "done");
-      });
-    });
-  });
+  fab?.addEventListener("click", () => openChat());
+  closeBtn?.addEventListener("click", () => closeChat());
 
-  document.querySelectorAll("form.composer").forEach((form) => {
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const scenario = form.dataset.scenario;
-      const text = new FormData(form).get("text");
-      send(scenario, String(text || ""));
-    });
+  form?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    send(String(new FormData(form).get("text") || ""));
   });
-
-  setupReveal();
 })();

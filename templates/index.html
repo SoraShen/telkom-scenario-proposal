@@ -22,79 +22,82 @@
   </header>
 
   <main>
-    <section class="hero reveal-block">
+    <section class="hero">
       <p class="eyebrow">Scenario choice · outside RAN / core</p>
-      <h1>Choose one non-network journey to replace troubleshooting</h1>
+      <h1>Choose one journey to replace troubleshooting</h1>
       <p class="lede">
         Keep balance, recharge, packages, FAQs, and human handoff.
-        Scroll to walk each <strong>user journey</strong>, then try the live demo and confirm the APIs.
+        Switch an option below to review its journey and APIs — then try it in the assistant.
       </p>
-      <div class="hero-cta">
-        <a class="btn primary" href="#opt-roaming">Start with Roaming</a>
-        <a class="btn ghost" href="#opt-security">Or SIM Security</a>
-      </div>
-      <p class="scroll-hint" aria-hidden="true">Scroll to explore journeys</p>
     </section>
 
-    <section class="strip reveal-block" id="how-to">
-      <div class="strip-inner">
-        <h2>How to use this demo</h2>
-        <ol class="howto-steps">
-          <li><strong>Scroll</strong> the 5-turn journey — highlights appear as you go</li>
-          <li><strong>Play</strong> or chat in the live GLM-5.2 demo</li>
-          <li><strong>Confirm</strong> the API list, then pick <em>one</em> replacement</li>
+    <section class="switcher" aria-label="Scenario options">
+      <div class="switcher-track" role="tablist">
+        {% for s in scenarios %}
+        <button
+          type="button"
+          class="switcher-btn{% if loop.first %} is-active{% endif %}"
+          role="tab"
+          id="tab-{{ s.id }}"
+          data-scenario="{{ s.id }}"
+          aria-selected="{{ 'true' if loop.first else 'false' }}"
+          aria-controls="panel-{{ s.id }}"
+        >
+          <span class="switcher-kicker">{{ s.tag }}</span>
+          <span class="switcher-title">{{ s.short }}</span>
+          <span class="switcher-sub">{{ s.verdict }}</span>
+        </button>
+        {% endfor %}
+      </div>
+    </section>
+
+    {% for s in scenarios %}
+    <section
+      class="scenario-panel{% if loop.first %} is-active{% endif %}"
+      id="panel-{{ s.id }}"
+      role="tabpanel"
+      aria-labelledby="tab-{{ s.id }}"
+      data-scenario="{{ s.id }}"
+      {% if not loop.first %}hidden{% endif %}
+    >
+      <div class="panel-intro">
+        <h2>{{ s.title }}</h2>
+        <p class="pick-if"><strong>Pick this if</strong> {{ s.pick_if }}</p>
+        <dl class="meta-inline">
+          <div><dt>Pain</dt><dd>{{ s.pain }}</dd></div>
+          <div><dt>Value</dt><dd>{{ s.value }}</dd></div>
+          <div><dt>Systems</dt><dd>{{ s.systems | join(' · ') }}</dd></div>
+        </dl>
+      </div>
+
+      <div class="journey-story">
+        <div class="journey-story-head">
+          <div>
+            <p class="eyebrow">User journey</p>
+            <h3>Five turns</h3>
+          </div>
+          <button type="button" class="btn play play-journey" data-play="{{ s.id }}">Play journey</button>
+        </div>
+        <ol class="timeline" id="steps-{{ s.id }}">
+          {% for step in s.journey %}
+          <li class="timeline-step" data-step-index="{{ loop.index0 }}">
+            <div class="timeline-rail" aria-hidden="true">
+              <span class="timeline-dot">{{ loop.index }}</span>
+              {% if not loop.last %}<span class="timeline-line"></span>{% endif %}
+            </div>
+            <div class="timeline-card">
+              <span class="step-label">{{ step.label }}</span>
+              <span class="step-hl">{{ step.highlight }}</span>
+              <p class="step-user">“{{ step.user }}”</p>
+            </div>
+          </li>
+          {% endfor %}
         </ol>
       </div>
-    </section>
 
-    <section class="options" id="options">
-      <header class="section-head reveal-block">
-        <h2>Two candidates · pick one</h2>
-        <p>Each path below is a full story: journey → why it matters → APIs → live try.</p>
-      </header>
-
-      {% for s in scenarios %}
-      <article class="scenario" data-scenario="{{ s.id }}" id="opt-{{ s.id }}">
-        <header class="scenario-intro reveal-block">
-          <p class="tag">{{ s.tag }}</p>
-          <h3>{{ s.title }}</h3>
-          <p class="verdict tone-{{ s.verdict_tone }}">{{ s.verdict }}</p>
-          <p class="pick-if"><strong>Pick this if</strong> {{ s.pick_if }}</p>
-          <dl class="meta meta-inline">
-            <div><dt>Pain</dt><dd>{{ s.pain }}</dd></div>
-            <div><dt>Value</dt><dd>{{ s.value }}</dd></div>
-            <div><dt>Systems</dt><dd>{{ s.systems | join(' · ') }}</dd></div>
-          </dl>
-        </header>
-
-        <section class="journey-story" aria-label="{{ s.short }} user journey">
-          <div class="journey-story-head reveal-block">
-            <div>
-              <p class="eyebrow">User journey</p>
-              <h4>Five turns · scroll to follow</h4>
-            </div>
-            <button type="button" class="btn play play-journey" data-play="{{ s.id }}">Play in demo</button>
-          </div>
-
-          <ol class="timeline" id="steps-{{ s.id }}">
-            {% for step in s.journey %}
-            <li class="timeline-step reveal-step" data-step-index="{{ loop.index0 }}">
-              <div class="timeline-rail" aria-hidden="true">
-                <span class="timeline-dot">{{ loop.index }}</span>
-                {% if not loop.last %}<span class="timeline-line"></span>{% endif %}
-              </div>
-              <div class="timeline-card">
-                <span class="step-label">{{ step.label }}</span>
-                <span class="step-hl">{{ step.highlight }}</span>
-                <p class="step-user">Customer: “{{ step.user }}”</p>
-              </div>
-            </li>
-            {% endfor %}
-          </ol>
-        </section>
-
-        <section class="highlights reveal-block">
-          <h4>Why this journey works</h4>
+      <div class="detail-grid">
+        <div class="highlights">
+          <h3>Highlights</h3>
           <ul class="highlight-grid">
             {% for h in s.highlights %}
             <li>
@@ -103,10 +106,9 @@
             </li>
             {% endfor %}
           </ul>
-        </section>
-
-        <section class="api-box reveal-block">
-          <h4>API dependencies to confirm</h4>
+        </div>
+        <div class="api-box">
+          <h3>API dependencies to confirm</h3>
           <p class="api-note">{{ s.api_note }}</p>
           <ul>
             {% for api in s.api_dependencies %}
@@ -116,51 +118,30 @@
             </li>
             {% endfor %}
           </ul>
-        </section>
-
-        <section class="demo reveal-block" aria-label="{{ s.short }} live demo">
-          <div class="demo-head">
-            <div>
-              <strong>Live demo</strong>
-              <span class="model-pill">GLM-5.2</span>
-              <span class="turn-pill" id="turn-{{ s.id }}" hidden></span>
-            </div>
-            <button type="button" class="linkish reset-btn" data-reset="{{ s.id }}">Reset</button>
-          </div>
-          <div class="messages" id="msg-{{ s.id }}" role="log" aria-live="polite"></div>
-          <div class="chips" id="chips-{{ s.id }}">
-            {% for c in s.chips %}
-            <button type="button" class="chip" data-scenario="{{ s.id }}" data-text="{{ c }}">{{ c }}</button>
-            {% endfor %}
-          </div>
-          <form class="composer" data-scenario="{{ s.id }}">
-            <input type="text" name="text" placeholder="Type as a Telkom customer…" autocomplete="off" enterkeyhint="send" required />
-            <button type="submit" class="btn primary send">Send</button>
-          </form>
-        </section>
-      </article>
-      {% endfor %}
+        </div>
+      </div>
     </section>
+    {% endfor %}
 
-    <section class="compare reveal-block">
+    <section class="compare">
       <header class="section-head">
-        <h2>Decision aid · pick one</h2>
-        <p>After walking both journeys, choose the replacement for troubleshooting.</p>
+        <h2>Decision aid</h2>
+        <p>Pick one replacement for troubleshooting after reviewing the journeys.</p>
       </header>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
               <th>Aspect</th>
-              <th>Option A · Roaming</th>
-              <th>Option B · Security</th>
+              <th>Roaming</th>
+              <th>Security</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td>Primary pain</td>
               <td>Abroad cost &amp; data anxiety</td>
-              <td>Lost phone / PIN / SIM swap urgency</td>
+              <td>Lost phone / PIN / SIM swap</td>
             </tr>
             <tr>
               <td>System domain</td>
@@ -168,18 +149,9 @@
               <td>CRM / RICA + SIM self-care</td>
             </tr>
             <tr>
-              <td>API complexity</td>
-              <td>Catalogue + activate + usage + bill</td>
-              <td>IDV + block/unblock + PUK + swap handoff</td>
-            </tr>
-            <tr>
               <td>Pick when</td>
-              <td>Roaming attach &amp; bill clarity matter most</td>
-              <td>Self-serve security / store deflection matters most</td>
-            </tr>
-            <tr>
-              <td>Replacement slot</td>
-              <td colspan="2">One of these replaces troubleshooting — keep balance, recharge, packages, FAQs, agent</td>
+              <td>Roaming attach &amp; bill clarity</td>
+              <td>Self-serve security / store deflection</td>
             </tr>
           </tbody>
         </table>
@@ -187,9 +159,33 @@
     </section>
 
     <footer class="footer">
-      <p>Huawei Cloud demo for Telkom design &amp; API readiness review — mocked backends, not production. Brand colours from telkom.co.za.</p>
+      <p>Huawei Cloud demo for Telkom — mocked backends, not production. Open the assistant (bottom right) to try the active scenario.</p>
     </footer>
   </main>
+
+  <div class="telkom-chat" id="telkom-chat">
+    <div class="chat-panel" id="chat-panel" role="dialog" aria-label="Telkom assistant" aria-hidden="true">
+      <div class="chat-header">
+        <img src="{{ base_path }}/static/img/bot-avatar.svg" alt="" width="40" height="40" />
+        <div class="chat-header-text">
+          <strong>Telkom Assistant</strong>
+          <span id="chat-status">Online · Roaming</span>
+        </div>
+        <div class="chat-header-actions">
+          <button type="button" class="chat-icon-btn" id="chat-close" title="Close" aria-label="Close">×</button>
+        </div>
+      </div>
+      <div class="chat-messages" id="chat-messages" aria-live="polite"></div>
+      <div class="chat-chips" id="chat-chips"></div>
+      <form class="chat-composer" id="chat-form">
+        <input id="chat-input" type="text" autocomplete="off" enterkeyhint="send" placeholder="Message the assistant…" aria-label="Message" required />
+        <button class="chat-send" type="submit">Send</button>
+      </form>
+    </div>
+    <button type="button" class="chat-fab" id="chat-fab" aria-label="Open Telkom assistant" aria-expanded="false">
+      <img src="{{ base_path }}/static/img/bot-avatar.svg" alt="" width="64" height="64" />
+    </button>
+  </div>
 
   <script id="scenario-data" type="application/json">{{ scenarios | tojson }}</script>
   <script src="{{ base_path }}/static/js/app.js"></script>
