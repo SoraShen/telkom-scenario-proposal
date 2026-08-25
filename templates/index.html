@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Telkom · BSS-First Chatbot Scenarios</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <div class="atmosphere" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="mark" aria-hidden="true">T</span>
+      <span class="brand-name">Telkom</span>
+      <span class="tagline">Possible Begins Here</span>
+    </div>
+    <p class="topbar-note">Huawei Cloud demo · BSS / CRM / charging only</p>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Scenario proposal</p>
+      <h1>Two BSS-first journeys to replace network troubleshooting</h1>
+      <p class="lede">
+        Keep balance, recharge, packages, FAQs, and human handoff.
+        Add <strong>Roaming</strong> and <strong>SIM Security</strong> — commercial self-service that does not wait on the network programme.
+      </p>
+      <div class="hero-cta">
+        <a class="btn primary" href="#options">Open live demos</a>
+        <a class="btn ghost" href="#recommendation">Fitness check</a>
+      </div>
+    </section>
+
+    <section class="strip" id="recommendation">
+      <div class="strip-inner">
+        <h2>Fitness check</h2>
+        <p>
+          Both options deliver tangible value without a new radio/core programme.
+          Roaming is pure BSS/OCS. Security reuses the same SIM lifecycle / self-care APIs already used for WhatsApp SIM swap — not a new HLR project.
+        </p>
+        <ul class="fit-list">
+          <li><span class="dot go"></span><strong>P0:</strong> International Roaming Assistant</li>
+          <li><span class="dot go"></span><strong>P0:</strong> SIM &amp; Account Security (existing self-care APIs)</li>
+          <li><span class="dot stay"></span><strong>Keep:</strong> Balance · Recharge · Packages · FAQs · Agent transfer</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="options" id="options">
+      <header class="section-head">
+        <h2>Proposals · multi-turn journeys · GLM-5.2 live demos</h2>
+        <p>Each option shows its highlights, a 5-turn user journey, and a live chat powered by Huawei Cloud MaaS <em>glm-5.2</em>.</p>
+      </header>
+
+      <div class="option-grid">
+        {% for s in scenarios %}
+        <article class="option" data-scenario="{{ s.id }}" id="opt-{{ s.id }}">
+          <div class="option-copy">
+            <p class="tag">{{ s.tag }}</p>
+            <h3>{{ s.title }}</h3>
+            <p class="verdict tone-{{ s.verdict_tone }}">{{ s.verdict }}</p>
+
+            <dl class="meta">
+              <div><dt>Pain</dt><dd>{{ s.pain }}</dd></div>
+              <div><dt>Value</dt><dd>{{ s.value }}</dd></div>
+              <div><dt>Systems</dt><dd>{{ s.systems | join(' · ') }}</dd></div>
+              <div><dt>Network</dt><dd>{{ s.network_touch }}</dd></div>
+            </dl>
+
+            <div class="highlights">
+              <h4>Highlights to showcase</h4>
+              <ul>
+                {% for h in s.highlights %}
+                <li>
+                  <strong>{{ h.title }}</strong>
+                  <span>{{ h.body }}</span>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+
+            <div class="journey" data-journey="{{ s.id }}">
+              <div class="journey-head">
+                <h4>User journey · 5 turns</h4>
+                <button type="button" class="btn play play-journey" data-play="{{ s.id }}">Play journey</button>
+              </div>
+              <ol class="journey-steps" id="steps-{{ s.id }}">
+                {% for step in s.journey %}
+                <li data-step-index="{{ loop.index0 }}">
+                  <span class="step-label">{{ step.label }}</span>
+                  <span class="step-hl">{{ step.highlight }}</span>
+                  <span class="step-user">“{{ step.user }}”</span>
+                </li>
+                {% endfor %}
+              </ol>
+            </div>
+          </div>
+
+          <div class="demo" aria-label="{{ s.short }} live demo">
+            <div class="demo-head">
+              <div>
+                <strong>Live demo</strong>
+                <span class="model-pill">GLM-5.2</span>
+                <span class="turn-pill" id="turn-{{ s.id }}" hidden></span>
+              </div>
+              <button type="button" class="linkish reset-btn" data-reset="{{ s.id }}">Reset</button>
+            </div>
+            <div class="messages" id="msg-{{ s.id }}" role="log" aria-live="polite"></div>
+            <div class="chips" id="chips-{{ s.id }}">
+              {% for c in s.chips %}
+              <button type="button" class="chip" data-scenario="{{ s.id }}" data-text="{{ c }}">{{ c }}</button>
+              {% endfor %}
+            </div>
+            <form class="composer" data-scenario="{{ s.id }}">
+              <input type="text" name="text" placeholder="Type as a Telkom customer…" autocomplete="off" required />
+              <button type="submit" class="btn primary send">Send</button>
+            </form>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="compare">
+      <header class="section-head">
+        <h2>Side-by-side</h2>
+        <p>Customer readout snapshot.</p>
+      </header>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Aspect</th>
+              <th>Roaming</th>
+              <th>Security</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>BSS-only purity</td>
+              <td>High</td>
+              <td>High (reuse self-care APIs)</td>
+            </tr>
+            <tr>
+              <td>Headline highlight</td>
+              <td>R194 week saving vs daily pass</td>
+              <td>Block in seconds after IDV</td>
+            </tr>
+            <tr>
+              <td>Revenue / retention</td>
+              <td>Bundle attach abroad</td>
+              <td>Fraud stop + churn prevention</td>
+            </tr>
+            <tr>
+              <td>Suggested phase</td>
+              <td>P0</td>
+              <td>P0</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p>Huawei Cloud demo environment for Telkom customer reference — not a live production service. Brand colours sampled from telkom.co.za.</p>
+    </footer>
+  </main>
+
+  <script id="scenario-data" type="application/json">{{ scenarios | tojson }}</script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
