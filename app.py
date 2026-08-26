@@ -34,6 +34,10 @@ def create_app() -> Flask:
 
     @app.context_processor
     def inject_base():
+        # Custom domain serves at site root; IP/path deploy keeps PUBLIC_BASE_PATH.
+        host = (request.host or "").split(":")[0].lower()
+        if host.endswith("alexsora.xyz"):
+            return {"base_path": ""}
         return {"base_path": BASE_PATH}
 
     @app.get("/")
